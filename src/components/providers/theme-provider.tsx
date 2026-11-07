@@ -10,15 +10,6 @@ interface ThemeProviderProps {
   storageKey?: string;
 }
 
-function getStoredTheme(key: string): Theme | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const stored = window.localStorage.getItem(key);
-    if (stored) return JSON.parse(stored) as Theme;
-  } catch {}
-  return null;
-}
-
 export function ThemeProvider({
   children,
   defaultTheme = "system",

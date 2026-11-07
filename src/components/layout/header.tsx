@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, MoreHorizontal, User, Sun as SunIcon, Moon as MoonIcon } from "lucide-react";
+import { Bell, MoreHorizontal, User, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/providers/theme-provider";
 
 export function Header() {
@@ -16,7 +16,7 @@ export function Header() {
           aria-label="Toggle theme"
           title={isDark ? "Light mode" : "Dark mode"}
         >
-          {isDark ? <SunIcon size={18} className="text-yellow-400" /> : <MoonIcon size={18} className="text-gray-600" />}
+          {isDark ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-gray-600" />}
         </button>
         <div className="h-5 w-px bg-border"></div>
         <button
