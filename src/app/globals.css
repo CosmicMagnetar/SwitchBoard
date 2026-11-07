@@ -17,12 +17,12 @@
     --ink-subtle: oklch(50% 0.01 250);
 
     /* Borders and inputs */
-    --border: oklch(28% 0.01 250 / 0.6);
-    --border-hover: oklch(35% 0.01 250 / 0.8);
+    --border: oklch(28% 0.01 250);
+    --border-hover: oklch(35% 0.01 250);
     --input: oklch(22% 0.02 250);
     --ring: oklch(65% 0.15 200 / 0.5);
 
-    /* Primary accent - Switch cyan, tuned for dark (lower chroma, higher lightness) */
+    /* Primary accent - Switch cyan, tuned for dark */
     --primary: oklch(68% 0.14 200);
     --primary-hover: oklch(72% 0.16 200);
     --primary-foreground: oklch(12% 0.02 250);
@@ -61,10 +61,6 @@
     --info-glow: oklch(72% 0.14 230 / 0.12);
 
     --radius: 0.875rem;
-    --shadow-sm: 0 1px 2px 0 oklch(0% 0% 0% / 0.3);
-    --shadow: 0 4px 6px -1px oklch(0% 0% 0% / 0.4), 0 2px 4px -1px oklch(0% 0% 0% / 0.2);
-    --shadow-lg: 0 10px 15px -3px oklch(0% 0% 0% / 0.5), 0 4px 6px -2px oklch(0% 0% 0% / 0.3);
-    --shadow-glow: 0 0 20px oklch(68% 0.14 200 / 0.25);
 
     /* Switch brand */
     --switch-dark: oklch(68% 0.14 200);
@@ -81,8 +77,8 @@
     --ink-muted: oklch(45% 0.01 250);
     --ink-subtle: oklch(55% 0.01 250);
 
-    --border: oklch(88% 0.01 250 / 0.6);
-    --border-hover: oklch(82% 0.01 250 / 0.8);
+    --border: oklch(88% 0.01 250);
+    --border-hover: oklch(82% 0.01 250);
     --input: oklch(100% 0 0);
     --ring: oklch(55% 0.18 200 / 0.5);
 
@@ -118,22 +114,17 @@
     --info-foreground: oklch(100% 0 0);
     --info-glow: oklch(60% 0.18 230 / 0.15);
 
-    --shadow-sm: 0 1px 2px 0 oklch(0% 0% 0% / 0.08);
-    --shadow: 0 4px 6px -1px oklch(0% 0% 0% / 0.1), 0 2px 4px -1px oklch(0% 0% 0% / 0.06);
-    --shadow-lg: 0 10px 15px -3px oklch(0% 0% 0% / 0.12), 0 4px 6px -2px oklch(0% 0% 0% / 0.08);
-    --shadow-glow: 0 0 20px oklch(55% 0.18 200 / 0.15);
-
     --switch-dark: oklch(55% 0.18 200);
   }
 }
 
 @layer base {
   * {
-    border-color: hsl(from var(--border) l c h / alpha-value(var(--border)));
+    border-color: var(--border);
   }
   body {
-    background-color: hsl(from var(--page) l c h / alpha-value(var(--page)));
-    color: hsl(from var(--ink) l c h / alpha-value(var(--ink)));
+    background-color: var(--page);
+    color: var(--ink);
     font-feature-settings: "rlig" 1, "calt" 0, "liga" 0;
     transition: background-color 0.4s ease, color 0.4s ease;
   }
@@ -147,7 +138,7 @@
     background: oklch(from var(--card) l c h / 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(from var(--border) l c h / alpha-value(var(--border)));
+    border: 1px solid var(--border);
   }
   .text-balance {
     text-wrap: balance;
