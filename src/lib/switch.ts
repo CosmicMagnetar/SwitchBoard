@@ -6,10 +6,9 @@
  * SSE in, HTTP out. Any agent that speaks it can join a room.
  *
  * Setup:
- * 1. Install Switch Console (desktop app)
- * 2. Start local server via Switch Console
- * 3. Connect a messaging app (Slack, Discord, Teams, etc.)
- * 4. Set SWITCH_SERVER_URL in .env.local (default: http://localhost:8765)
+ * 1. Run ./setup-switch.sh or docker-compose up -d
+ * 2. Set NEXT_PUBLIC_SWITCH_SERVER_URL in .env.local (default: http://localhost:8765)
+ * 3. Connect a messaging app via Switch Console
  */
 
 export interface SwitchRoom {
@@ -57,13 +56,22 @@ export interface SwitchConnectionStatus {
 }
 
 const SWITCH_SERVER_URL =
-  process.env.NEXT_PUBLIC_SWITCH_SERVER_URL || "http://localhost:8765";
+  typeof window !== "undefined"
+    ? (window as any).NEXT_PUBLIC_SWITCH_SERVER_URL ||
+      process.env.NEXT_PUBLIC_SWITCH_SERVER_URL ||
+      "http://localhost:8765"
+    : process.env.NEXT_PUBLIC_SWITCH_SERVER_URL || "http://localhost:8765";
 
 class SwitchClient {
   private eventSource: EventSource | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private connected = false;
+  private serverUrl: string;
+
+  constructor(serverUrl?: string) {
+    this.serverUrl = serverUrl || SWITCH_SERVER_URL;
+  }
 
   on(event: string, callback: (data: any) => void) {
     if (!this.listeners.has(event)) {
@@ -86,11 +94,11 @@ class SwitchClient {
     }
 
     try {
-      this.eventSource = new EventSource(`${SWITCH_SERVER_URL}/api/stream`);
+      this.eventSource = new EventSource(`${this.serverUrl}/api/stream`);
 
       this.eventSource.onopen = () => {
         this.connected = true;
-        this.emit("connect", { connected: true });
+        this.emit("connect", { connected: true, serverUrl: this.serverUrl });
         this.scheduleReconnectClear();
       };
 
@@ -142,13 +150,15 @@ class SwitchClient {
 
   async getStatus(): Promise<SwitchConnectionStatus> {
     try {
-      const res = await fetch(`${SWITCH_SERVER_URL}/api/status`);
+      const res = await fetch(`${this.serverUrl}/api/status`, {
+        signal: AbortSignal.timeout(3000),
+      });
       if (!res.ok) throw new Error("Switch server unreachable");
       return res.json();
     } catch {
       return {
         connected: false,
-        serverUrl: SWITCH_SERVER_URL,
+        serverUrl: this.serverUrl,
         bridge: null,
         rooms: 0,
         agents: 0,
@@ -158,7 +168,9 @@ class SwitchClient {
 
   async getRooms(): Promise<SwitchRoom[]> {
     try {
-      const res = await fetch(`${SWITCH_SERVER_URL}/api/rooms`);
+      const res = await fetch(`${this.serverUrl}/api/rooms`, {
+        signal: AbortSignal.timeout(5000),
+      });
       if (!res.ok) throw new Error("Failed to fetch rooms");
       return res.json();
     } catch {
@@ -168,7 +180,9 @@ class SwitchClient {
 
   async getAgents(): Promise<SwitchAgent[]> {
     try {
-      const res = await fetch(`${SWITCH_SERVER_URL}/api/agents`);
+      const res = await fetch(`${this.serverUrl}/api/agents`, {
+        signal: AbortSignal.timeout(5000),
+      });
       if (!res.ok) throw new Error("Failed to fetch agents");
       return res.json();
     } catch {
@@ -177,7 +191,7 @@ class SwitchClient {
   }
 
   async sendMessage(roomId: string, content: string): Promise<void> {
-    const res = await fetch(`${SWITCH_SERVER_URL}/api/rooms/${roomId}/messages`, {
+    const res = await fetch(`${this.serverUrl}/api/rooms/${roomId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content }),
@@ -186,14 +200,14 @@ class SwitchClient {
   }
 
   async approveAgentAction(actionId: string): Promise<void> {
-    const res = await fetch(`${SWITCH_SERVER_URL}/api/agents/actions/${actionId}/approve`, {
+    const res = await fetch(`${this.serverUrl}/api/agents/actions/${actionId}/approve`, {
       method: "POST",
     });
     if (!res.ok) throw new Error("Failed to approve action");
   }
 
   async rejectAgentAction(actionId: string): Promise<void> {
-    const res = await fetch(`${SWITCH_SERVER_URL}/api/agents/actions/${actionId}/reject`, {
+    const res = await fetch(`${this.serverUrl}/api/agents/actions/${actionId}/reject`, {
       method: "POST",
     });
     if (!res.ok) throw new Error("Failed to reject action");

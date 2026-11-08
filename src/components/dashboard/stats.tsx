@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   LayoutDashboard,
   Bot,
@@ -12,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { memoWithName } from "@/lib/performance";
 
 const statVariants = {
@@ -19,83 +21,74 @@ const statVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const stats = [
-  {
-    label: "Active Rooms",
-    value: "4",
-    sub: "across Slack, Discord & Teams",
-    icon: LayoutDashboard,
-    color: "text-primary",
-    glow: "bg-primary-glow",
-  },
-  {
-    label: "AI Agents",
-    value: "5",
-    sub: "working alongside your team",
-    icon: Bot,
-    color: "text-purple-400 dark:text-purple-500",
-    glow: "bg-purple-500/10",
-  },
-  {
-    label: "Unread Messages",
-    value: "13",
-    sub: "AI-triaged and routed",
-    icon: MessageCircle,
-    color: "text-amber-400 dark:text-amber-500",
-    glow: "bg-amber-500/10",
-  },
-  {
-    label: "Pending Tasks",
-    value: "3",
-    sub: "waiting for your review",
-    icon: Clock,
-    color: "text-blue-400 dark:text-blue-500",
-    glow: "bg-blue-500/10",
-  },
-];
-
 const StatCard = memoWithName(
-  ({ stat }: { stat: (typeof stats)[number] }) => {
-    const Icon = stat.icon;
-    return (
-      <motion.div
-        variants={statVariants}
-        initial="hidden"
-        animate="visible"
-        className="rounded-2xl border border-border bg-card p-5 shadow relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 p-4 opacity-10">
-          <Icon size={48} className={stat.color} />
+  ({ label, value, sub, icon: Icon, color, glow }: {
+    label: string;
+    value: number | string;
+    sub: string;
+    icon: any;
+    color: string;
+    glow: string;
+  }) => (
+    <motion.div
+      variants={statVariants}
+      initial="hidden"
+      animate="visible"
+      className="rounded-2xl border border-border bg-card p-5 shadow relative overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 p-4 opacity-10">
+        <Icon size={48} className={color} />
+      </div>
+      <div className="relative z-10 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className="text-3xl font-bold mt-1">{value}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
         </div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              {stat.label}
-            </p>
-            <p className="text-3xl font-bold mt-1">{stat.value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {stat.sub}
-            </p>
-          </div>
-          <div className={`p-2 rounded-xl ${stat.glow}`}>
-            <Icon size={16} className={stat.color} />
-          </div>
+        <div className={`p-2 rounded-xl ${glow}`}>
+          <Icon size={16} className={color} />
         </div>
-      </motion.div>
-    );
-  },
+      </div>
+    </motion.div>
+  ),
   "StatCard"
 );
 
-export function StatsRow() {
+export function StatsRow({ rooms = 4, agents = 5 }: { rooms?: number; agents?: number } = {}) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat, i) => (
-        <StatCard
-          key={stat.label}
-          stat={stat}
-        />
-      ))}
+      <StatCard
+        label="Active Rooms"
+        value={rooms}
+        sub="across Slack, Discord & Teams"
+        icon={LayoutDashboard}
+        color="text-primary"
+        glow="bg-primary-glow"
+      />
+      <StatCard
+        label="AI Agents"
+        value={agents}
+        sub="working alongside your team"
+        icon={Bot}
+        color="text-purple-400 dark:text-purple-500"
+        glow="bg-purple-500/10"
+      />
+      <StatCard
+        label="Unread Messages"
+        value="13"
+        sub="AI-triaged and routed"
+        icon={MessageCircle}
+        color="text-amber-400 dark:text-amber-500"
+        glow="bg-amber-500/10"
+      />
+      <StatCard
+        label="Pending Tasks"
+        value="3"
+        sub="waiting for your review"
+        icon={Clock}
+        color="text-blue-400 dark:text-blue-500"
+        glow="bg-blue-500/10"
+      />
     </div>
   );
 }
@@ -133,29 +126,22 @@ export function QuickActions() {
   );
 }
 
-function ActionButton({
-  icon,
-  label,
-  desc,
-  className,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  desc: string;
-  className?: string;
-}) {
-  return (
-    <motion.button
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      className={`
-        flex flex-col items-start gap-1.5 p-4 rounded-xl border border-border bg-background text-left transition-all duration-200
-        ${className}
-      `}
-    >
-      <span className="p-1.5 rounded-lg bg-secondary">{icon}</span>
-      <div className="text-sm font-medium">{label}</div>
-      <div className="text-xs text-muted-foreground">{desc}</div>
-    </motion.button>
-  );
-}
+const ActionButton = memoWithName(
+  ({ icon, label, desc, className }: { icon: React.ReactNode; label: string; desc: string; className?: string }) => {
+    return (
+      <motion.button
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+        className={cn(
+          "flex flex-col items-start gap-1.5 p-4 rounded-xl border border-border bg-background text-left transition-all duration-200",
+          className
+        )}
+      >
+        <span className="p-1.5 rounded-lg bg-secondary">{icon}</span>
+        <div className="text-sm font-medium">{label}</div>
+        <div className="text-xs text-muted-foreground">{desc}</div>
+      </motion.button>
+    );
+  },
+  "ActionButton"
+);
