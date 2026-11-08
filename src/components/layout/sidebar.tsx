@@ -10,12 +10,12 @@ import {
   Bot,
   Mic,
   Settings,
-  Menu,
   Sun,
   Moon,
-  Monitor,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useTheme } from "@/components/providers/theme-provider";
+import { SwitchBoardLogo } from "@/components/layout/logo";
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
@@ -32,13 +32,10 @@ export function Sidebar() {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 w-64 border-r border-border bg-card/95 backdrop-blur-xl flex flex-col">
+    <aside className="fixed inset-y-0 left-0 z-30 w-72 border-r border-border bg-card/95 backdrop-blur-xl flex flex-col">
       <div className="flex items-center justify-between h-16 px-5 shrink-0">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/30 relative overflow-hidden">
-            <span className="relative text-lg font-bold tracking-tighter">S</span>
-          </div>
-          <span className="font-bold text-xl tracking-tight">SwitchBoard</span>
+        <Link href="/" className="flex items-center gap-2">
+          <SwitchBoardLogo className="" />
         </Link>
         <button
           onClick={toggleTheme}
@@ -55,7 +52,11 @@ export function Sidebar() {
           const active = pathname === item.href;
           const Icon = item.icon;
           return (
-            <div key={item.key} className="group">
+            <motion.div
+              key={item.key}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <Link
                 href={item.href}
                 className={`
@@ -68,7 +69,7 @@ export function Sidebar() {
                 <Icon size={18} />
                 {item.label}
               </Link>
-            </div>
+            </motion.div>
           );
         })}
       </nav>

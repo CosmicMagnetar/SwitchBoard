@@ -3,9 +3,15 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SwitchBoard — Your team, one place",
+  title: "SwitchBoard — Human + AI Agent Team OS",
   description:
     "Connect your human team and AI agents in one dashboard. Powered by Switch.",
+  openGraph: {
+    title: "SwitchBoard — Human + AI Agent Team OS",
+    description:
+      "Unified dashboard connecting Slack, Discord, Teams, Telegram, and Gmail with AI agents via Switch.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

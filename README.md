@@ -11,14 +11,15 @@ The app runs in demo mode out of the box. You will see simulated rooms, agents, 
 - A **Demo Mode** banner appears on the Dashboard and Connections pages
 - All data is mock data for demonstration
 - No credentials are required to browse
+- Voice capture works in the browser via Web Speech API (Chrome, Edge, Safari)
 
 ## Connecting real Switch
 
-Switch is not a cloud service you sign up for. It is self-hosted on your own machine via the Switch Console desktop app.
+Switch is **not hosted by this repo.** It is self-hosted on **your** computer via the Switch Console desktop app.
 
 ### Where Switch is hosted
 
-Switch runs **locally on your computer**, not in the cloud. When you install Switch Console and start a server, it runs at:
+Switch runs locally on your computer, not in the cloud. When you install Switch Console and start a server, it runs at:
 
 ```
 http://localhost:8765
@@ -57,7 +58,7 @@ A solo founder, startup founder, or community manager needs one place to manage 
 - **AI triage** — each message is tagged with intent (bug, request, task, update) and auto-routed to the right person or agent
 - **Team board** — Trello-style kanban for tasks sourced from messages, email, or voice
 - **AI agents** — agents live in Switch rooms; you review and approve their drafts before they send
-- **Voice capture** — record a voice memo, transcribe it, understand the intent, route it (transcription wired in a future phase)
+- **Voice capture** — record a voice memo, transcribe it in the browser, understand the intent, route it
 
 ## How Switch fits (judging criterion: Switch is central)
 
@@ -67,8 +68,6 @@ Switch is central to this project. Without Switch, the dashboard does not work.
 2. AI agents join rooms with their own name and avatar
 3. Messages flow into this unified inbox and get routed
 4. Agent actions (send email, post message) wait for your approval (human-in-the-loop)
-
-Switch runs locally via Docker and exposes an agent protocol (SSE in, HTTP out). This dashboard connects to that local server to read rooms, agents, and messages in real time.
 
 ## Target audience
 
@@ -84,6 +83,7 @@ Primary user: solo founder, startup founder, or community manager. The dashboard
 - shadcn/ui primitives (Radix UI)
 - Switch Agent Protocol (SSE client)
 - Slack Web API and Events API
+- Web Speech API (voice capture, browser-based)
 
 ## Design system
 
@@ -95,6 +95,8 @@ Dark-first OKLCH color theory:
 - Perceptually uniform color steps for accessibility
 - Full light mode support with automatic system detection
 - Working dark/light/system theme toggle in sidebar and header
+- Page transition animations on route changes
+- Skeletons for smooth perceived performance
 
 ## Getting started
 
@@ -134,18 +136,20 @@ Dark-first OKLCH color theory:
 
 5. Open http://localhost:3000
 
+6. Tutorial — An embedded tutorial walks you through the dashboard on first visit. It can be dismissed or re-opened.
+
 ## Project structure
 
 ```
 SwitchBoard/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Dashboard home (demo mode)
+│   │   ├── page.tsx              # Dashboard home (demo mode + page transitions)
 │   │   ├── connections/page.tsx  # Switch and app connections + demo mode banner
 │   │   ├── inbox/page.tsx        # Unified message inbox
 │   │   ├── board/page.tsx        # Kanban task board
 │   │   ├── agents/page.tsx       # AI agent management
-│   │   ├── voice/page.tsx        # Voice capture
+│   │   ├── voice/page.tsx        # Voice capture (Web Speech API)
 │   │   ├── api/
 │   │   │   ├── switch/status/    # Switch server status
 │   │   │   ├── switch/rooms/     # Switch room list
@@ -154,27 +158,34 @@ SwitchBoard/
 │   │   ├── layout.tsx            # Root layout with theme provider
 │   │   └── globals.css           # OKLCH design system tokens
 │   ├── components/
-│   │   ├── ui/                   # Base UI components (button, card, badge, etc.)
-│   │   ├── layout/               # Sidebar, header, theme toggle
-│   │   ├── dashboard/            # Stats cards, quick actions
+│   │   ├── ui/                   # Base UI components (button, card, badge, skeleton, etc.)
+│   │   ├── layout/               # Sidebar, header, logo, page transitions, theme toggle
+│   │   ├── tutorial/             # Embedded onboarding tutorial overlay
+│   │   ├── dashboard/            # Stats cards (memoized), quick actions (memoized)
 │   │   ├── inbox/                # Unified inbox table
 │   │   ├── kanban/               # Kanban board and task cards
 │   │   ├── agents/               # AI agent cards
-│   │   ├── voice/                # Voice capture UI
+│   │   ├── voice/                # Voice capture UI (Web Speech API)
 │   │   └── connections/          # Switch bridge, demo mode banner, platform connections
 │   ├── lib/
 │   │   ├── switch.ts             # Switch agent protocol client
 │   │   ├── slack.ts              # Slack Web API client (stub for demo)
 │   │   ├── supabase.ts           # Optional persistence client
-│   │   └── utils.ts              # Utility functions
+│   │   ├── utils.ts              # Utility functions
+│   │   └── performance.ts        # Memo helpers + intersection observer
 │   ├── data/
 │   │   └── mock.ts               # Mock data for demo mode
 │   └── providers/
 │       └── theme-provider.tsx    # Dark/light/theme context
 ├── .env.example                  # Environment variable template
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml                # CI: lint, typecheck, build
+│   │   └── deploy.yml            # Deploy to Vercel
 ├── README.md                     # This file
 ├── CONTRIBUTING.md               # Contribution guide
 ├── LICENSE                       # Apache 2.0 + Commons Clause
+├── TESTING.md                    # Testing & performance documentation
 ├── next.config.js
 ├── tailwind.config.js
 ├── postcss.config.js

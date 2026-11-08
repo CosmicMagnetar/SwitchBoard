@@ -1,7 +1,10 @@
 "use client"
 
-import { ArrowRight, Zap, ShieldCheck } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { ArrowRight, Zap, ShieldCheck } from "lucide-react";
+import { memoWithName } from "@/lib/performance";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function QuickActions() {
   return (
@@ -36,15 +39,18 @@ export function QuickActions() {
   )
 }
 
-function ActionButton({ icon, label, desc, className }: { icon: React.ReactNode; label: string; desc: string; className?: string }) {
-  return (
-    <button className={cn(
-      "flex flex-col items-start gap-1.5 p-4 rounded-xl border border-border bg-background hover:bg-accent hover:border-primary/30 transition-all duration-200 text-left",
-      className
-    )}>
-    <span className="p-1.5 rounded-lg bg-secondary">{icon}</span>
-    <div className="text-sm font-medium">{label}</div>
-    <div className="text-xs text-muted-foreground">{desc}</div>
-    </button>
-  )
-}
+const ActionButton = memoWithName(
+  ({ icon, label, desc, className }: { icon: React.ReactNode; label: string; desc: string; className?: string }) => {
+    return (
+      <button className={cn(
+        "flex flex-col items-start gap-1.5 p-4 rounded-xl border border-border bg-background hover:bg-accent hover:border-primary/30 transition-all duration-200 text-left",
+        className
+      )}>
+      <span className="p-1.5 rounded-lg bg-secondary">{icon}</span>
+      <div className="text-sm font-medium">{label}</div>
+      <div className="text-xs text-muted-foreground">{desc}</div>
+      </button>
+    )
+  },
+  "ActionButton"
+);

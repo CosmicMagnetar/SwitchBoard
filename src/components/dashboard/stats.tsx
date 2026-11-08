@@ -12,6 +12,7 @@ import {
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { memoWithName } from "@/lib/performance";
 
 const statVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -53,36 +54,47 @@ const stats = [
   },
 ];
 
+const StatCard = memoWithName(
+  ({ stat }: { stat: (typeof stats)[number] }) => {
+    const Icon = stat.icon;
+    return (
+      <motion.div
+        variants={statVariants}
+        initial="hidden"
+        animate="visible"
+        className="rounded-2xl border border-border bg-card p-5 shadow relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <Icon size={48} className={stat.color} />
+        </div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              {stat.label}
+            </p>
+            <p className="text-3xl font-bold mt-1">{stat.value}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {stat.sub}
+            </p>
+          </div>
+          <div className={`p-2 rounded-xl ${stat.glow}`}>
+            <Icon size={16} className={stat.color} />
+          </div>
+        </div>
+      </motion.div>
+    );
+  },
+  "StatCard"
+);
+
 export function StatsRow() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, i) => (
-        <motion.div
+        <StatCard
           key={stat.label}
-          variants={statVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: i * 0.08, duration: 0.4 }}
-          className="rounded-2xl border border-border bg-card p-5 shadow relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <stat.icon size={48} className={stat.color} />
-          </div>
-          <div className="relative z-10 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {stat.label}
-              </p>
-              <p className="text-3xl font-bold mt-1">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {stat.sub}
-              </p>
-            </div>
-            <div className={`p-2 rounded-xl ${stat.glow}`}>
-              <stat.icon size={16} className={stat.color} />
-            </div>
-          </div>
-        </motion.div>
+          stat={stat}
+        />
       ))}
     </div>
   );
